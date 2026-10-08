@@ -1,0 +1,48 @@
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid",
+        "profile": {
+          "email": { ".validate": "newData.isString() && newData.val().length <= 320" },
+          "displayName": { ".validate": "newData.isString() && newData.val().length <= 120" }
+        },
+        "resume": {
+          ".validate": "newData.hasChildren(['text', 'fileName', 'uploadedAt'])",
+          "text": { ".validate": "newData.isString() && newData.val().length <= 50000" }
+        },
+        "analyses": {
+          "$id": {
+            ".validate": "newData.hasChildren(['jobTitle', 'score', 'createdAt']) || !newData.exists()",
+            "jobDescription": { ".validate": "newData.isString() && newData.val().length <= 50000" }
+          }
+        },
+        "applications": {
+          "$id": {
+            ".validate": "newData.hasChildren(['company', 'role', 'status', 'createdAt', 'updatedAt'])",
+            "status": { ".validate": "newData.val().matches(/^(saved|applied|interview|offer|rejected)$/)" }
+          }
+        },
+        "savedJobs": {
+          "$jobId": {
+            ".validate": "!newData.exists() || newData.hasChildren(['job', 'status', 'savedAt', 'updatedAt'])",
+            "status": { ".validate": "newData.val().matches(/^(saved|interested|applied)$/)" },
+            "notes": { ".validate": "newData.isString() && newData.val().length <= 2000" },
+            "savedAt": { ".validate": "newData.isNumber()" },
+            "updatedAt": { ".validate": "newData.isNumber()" },
+            "job": {
+              ".validate": "newData.hasChildren(['id', 'title', 'company', 'applyUrl', 'source'])",
+              "id": { ".validate": "newData.isString() && newData.val().length <= 200" },
+              "title": { ".validate": "newData.isString() && newData.val().length <= 300" },
+              "company": { ".validate": "newData.isString() && newData.val().length <= 300" },
+              "description": { ".validate": "newData.isString() && newData.val().length <= 12000" },
+              "applyUrl": { ".validate": "newData.isString() && newData.val().matches(/^https?:\\/\\/.+/)" },
+              "source": { ".validate": "newData.isString() && newData.val().length <= 100" }
+            }
+          }
+        }
+      }
+    }
+  }
+}
